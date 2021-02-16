@@ -6,19 +6,21 @@ require_once('./se.php');
 
 $sqsdb = new sqsModel;
 
-use Symfony\Component\Dotenv\Dotenv;
-$dotenv = new Dotenv();
-$dotenv->load('../.env');
-#$_ENV superglobal is available to see specific user settings in .env
-
 use Symfony\Component\HttpFoundation\Request;
-$request = Request::createFromGlobals();
 use Symfony\Component\HttpFoundation\Response;
-$response = new Response();
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+
+$request = Request::createFromGlobals();
+$response = new Response();
 $session = new Session();
 
 $response->headers->set('Content-Type', 'application/json');
+$response->headers->set('Access-Control-Allow-Headers', 'origin, content-type, accept');
+$response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+$response->headers->set('Access-Control-Allow-Origin', $_ENV['ORIGIN']);
+$response->headers->set('Access-Control-Allow-Credentials', 'true');
+
 $session->start();
 
 if($session->has('sessionObj') == false) {
@@ -36,8 +38,12 @@ if(empty($request->query->all())) {
                 $request->request->has('password') and 
                 $request->request->has('email') and 
                 $request->request->has('phone')) {
-
-                //$res = $session->get('sessionObj')->is_rate_limited();
+                $res = $session->get('sessionObj')->register(
+                    $request->request->getInt('username'),
+                    $request->request->get('password'),
+                    $request->request->has('email'),
+                    $request->request->has('phone')
+                );
                 if($res == true) {
                     $response->setStatusCode(201);
                 } else {
@@ -48,16 +54,14 @@ if(empty($request->query->all())) {
             }
         } elseif($request->query->getAlpha('action') == 'login') {
             if($request->request->has('username') and 
-                $request->request->isnumeric('username') and 
                 $request->request->has('password')) {
-                $res = $session->get('sessionObj')->login($request->request->get('username'),
+                $res = $session->get('sessionObj')->login($request->request->getInt('username'),
                     $request->request->get('password'));
-                if ($res == true) {
-                    //$session->set('userlogin', true);
-                    //$session->set('userid', $request->request->has('username'))
-                    $response->setStatusCode(200);
-                } else {
+                if ($res == false) {
                     $response->setStatusCode(403);
+                } else {
+                    $response->setContent(json_encode($res));
+                    $response->setStatusCode(200);
                 }
             } else {
                 $response->setStatusCode(400);
@@ -75,11 +79,13 @@ if(empty($request->query->all())) {
         }
         elseif($request->query->getAlpha('action') == 'accountexists') {
             $response->setStatusCode(204);
-        }
-        elseif($request->query->getAlpha('action') == 'securepage') {
+        } elseif($request->query->getAlpha('action') == 'securepage') {
             // if user loggedin
             //$response->setStatusCode(200);
             $response->setStatusCode(403);
+        } elseif($request->query->getAlpha('action') == 'logout') {
+            $response->setContent(json_encode(Array('Success'=>'true')));
+            $response->setStatusCode(200);
         } else {
             $response->setStatusCode(400);
         }
@@ -94,8 +100,9 @@ if(empty($request->query->all())) {
     }
 
 } else {
-    $response = new RedirectResponse('api.php');
+    $redirect = new RedirectResponse('api.php');
 }
+
 
 $response->send();
 

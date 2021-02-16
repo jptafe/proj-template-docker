@@ -1,0 +1,52 @@
+version: '3.1'
+
+services:
+  db:
+    image: mysql:5.7
+    container_name: persistence
+    restart: always
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d/
+    environment:
+      MYSQL_DATABASE: "${DB}"
+      MYSQL_USER: "${DBU}"
+      MYSQL_PASSWORD: "${DBP}"
+      MYSQL_RANDOM_ROOT_PASSWORD: "1"
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: persistence-admin
+    restart: always
+    environment:
+      PMA_HOST: "${DBH}"
+      PMA_USER: "${DBU}"
+      PMA_PASSWORD: "${DBP}"
+      PMA_ARBITRARY: "1"
+    ports:
+      - 9999:80
+  backend:
+    image: drupal:9-php7.4-apache
+    container_name: backend 
+    restart: always
+    environment:
+      HOST: "${DBH}"
+      DBASE: "${DB}"
+      USER: "${DBU}"
+      PASS: "${DBP}"
+      ORIGIN: "${ORIGIN}"
+    ports:
+      - 9998:80
+    working_dir: /opt
+    volumes:
+      - .:/opt:z
+    command: bash -c "cd api && composer update && rm /var/www/html && ln -s /opt/api /var/www/html && /usr/local/bin/apache2-foreground"
+  frontend:
+    image: httpd:2.4
+    container_name: frontend 
+    restart: always
+    environment:
+      API: "${API}"
+    ports:
+      - 9997:80
+    working_dir: /usr/local/apache2/htdocs
+    volumes:
+      - ./app:/usr/local/apache2/htdocs:z
