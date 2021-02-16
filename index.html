@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Forms</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
+</head>
+<body>
+    <form action="api/api.php?action=login" method="POST">
+        <input type="text" name="username" placeholder="user name" id="loginuser" required>
+        <input type="password" name="password" placeholder="password" id="loginpass" required>
+        <input type="submit" name="submit">
+    </form>
+    <form action="api/api.php?action=register" method="POST">
+        <input type="email" name="email" placeholder="email" id="regemail" required>
+        <input type="number" name="phone" placeholder="phone" id="regphone" required>
+        <input type="text" name="username" placeholder="user name" id="reguser" required>
+        <input type="password" name="password" placeholder="password" id="regpass" required>
+        <input type="submit" name="submit">
+    </form>
+    <div>
+        <a href="api/api.php?action=isloggedin">logged in?</a>
+    </div>
+    <form action="api/api.php" method="GET">
+        <input type="hidden" name="action" value="accountexists">
+        <input type="text" name="username"  placeholder="user name" id="checkuser" required
+        title="youre an idiot">
+        <input type="submit" name="submit">
+    </form>
+</body>
+</html>
