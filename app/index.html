@@ -1,44 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <title>Test Forms</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="app.js" defer></script>
+       <title>Test Forms</title>
+       <link rel="stylesheet" href="style.css">
+       <script src="app.js" defer></script>
 </head>
+
 <body>
-    <form action="http://localhost:9998/api.php?action=login" 
-          method="POST" 
-          id="loginform">
-        <input type="text" name="username" placeholder="user name" 
-               id="loginuser" value="username" required>
-        <input type="password" name="password" placeholder="password" 
-               id="loginpass" value="password" required>
-        <input type="submit" name="submit">
-    </form>
-    <form action="http://localhost:9998/api.php?action=register" 
-          method="POST" 
-          id="registerform">
-        <input type="email" name="email" placeholder="email" 
-               id="regemail" value="email@email.com" required>
-        <input type="number" name="phone" placeholder="phone" 
-               id="regphone" value="123412341234" required>
-        <input type="text" name="username" placeholder="user name" 
-               id="reguser" value="username" required>
-        <input type="password" name="password" placeholder="password" 
-               id="regpass" value="password" required>
-        <input type="submit" name="submit">
-    </form>
-    <div>
-        <a href="#"
-           id="linkisloggedin">logged in?</a>
-    </div>
-    <form action="http://localhost:9998/api.php" 
-          method="GET">
-        <input type="hidden" name="action" value="accountexists">
-        <input type="text" name="username" placeholder="user name" title="please enter a username" 
-        id="accountexists" required>
-        <input type="submit" name="submit">
-    </form>
-    <button id="logoutbutton">logout</button>
+       <form action="http://localhost:9998/api.php?action=login" method="POST" id="loginform">
+              <input type="text" name="username" placeholder="user name" id="loginuser" value="455846105" required>
+              <input type="password" name="password" placeholder="password" id="loginpass" value="asdfasdf" required>
+              <input type="submit" name="submit">
+       </form>
+       <form action="http://localhost:9998/api.php?action=register" method="POST" id="registerform">
+              <input type="text" name="usericon" placeholder="icon" id="regicon" value="icon-text" required>
+              <input type="color" name="usercolor" id="regcolor" required>
+              <input type="text" name="nickname" placeholder="nick name" id="regnick" value="nickname" required>
+              <input type="password" name="password1" placeholder="password" id="regpass1" value="password" required>
+              <input type="password" name="password2" placeholder="password again" id="regpass2" value="password" required>
+              <input type="submit" name="submit">
+       </form>
+       <div>
+              <a href="#" id="linkisloggedin">logged in?</a>
+       </div>
+       <form action="http://localhost:9998/api.php" method="GET">
+              <input type="hidden" name="action" value="accountexists">
+              <input type="text" name="username" placeholder="user name" title="please enter a username"
+                     id="accountexists" required>
+       </form>
+       <button id="logoutbutton">logout</button>
 </body>
+
 </html>

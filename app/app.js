@@ -20,6 +20,10 @@ function fetchlogin(evt) {
             console.log('login failed');
             return;
         }
+        if(headers.status == 203) {
+            console.log('registration required');
+            return;
+        }
         headers.json().then(function(body) {
             console.log(body); // get a CSRF token
         })

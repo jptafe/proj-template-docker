@@ -28,12 +28,13 @@
         }
         public function login($username, $password) {
             global $sqsdb;
-
             // call the dbobject for SQL
             // return a session hash if successful
             $this->user_id = $sqsdb->checkLogin($username, $password);
             if($this->user_id > 0) {
                 return Array('Hash'=>'90q2u3lksafdu90342oifkl');
+            } elseif($this->user_id === 0) {
+                return 0;
             } else {
                 return false;
             }
@@ -49,11 +50,14 @@
             }
         }
         public function isLoggedIn() {
-            if($this->user_privilege == 0 and $user_id == 0) {
+            if($this->user_id == 0) {
                 return false;
             } else {
                 return true;
             }
+        }
+        public function logout() {
+            $this->user_id = 0;
         }
     }
 ?>

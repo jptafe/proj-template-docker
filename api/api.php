@@ -34,7 +34,8 @@ if(empty($request->query->all())) {
 } elseif($request->cookies->has('PHPSESSID')) {
     if($session->get('sessionObj')->is_rate_limited()) {
         $response->setStatusCode(429);
-    } elseif($request->getMethod() == 'POST') {             // register, login
+    }
+    if($request->getMethod() == 'POST') {             // register, login
         if($request->query->getAlpha('action') == 'register') {
             if($request->request->has('username') and
                 $request->request->has('password') and
@@ -59,8 +60,10 @@ if(empty($request->query->all())) {
                 $request->request->has('password')) {
                 $res = $session->get('sessionObj')->login($request->request->getInt('username'),
                     $request->request->get('password'));
-                if ($res == false) {
+                if ($res === false) {
                     $response->setStatusCode(401);
+                } elseif($res === 0) {
+                    $response->setStatusCode(203);
                 } else {
                     $response->setContent(json_encode($res));
                     $response->setStatusCode(200);
@@ -75,9 +78,12 @@ if(empty($request->query->all())) {
     if($request->getMethod() == 'GET') {              // showqueu, accountexists
         if($request->query->getAlpha('action') == 'accountexists') {
             if($request->query->has('username')) {
-                $response->setStatusCode(204);
-            } else {
-                $response->setStatusCode(400);
+                $res = $sqsdb->userExists($request->query->getInt('username'));
+                if($res) {
+                    $response->setStatusCode(400);
+                } else {
+                    $response->setStatusCode(204);
+                }
             }
         } elseif($request->query->getAlpha('action') == 'isloggedin') {
             if($session->get('sessionObj')->isLoggedIn()) {
@@ -86,20 +92,18 @@ if(empty($request->query->all())) {
                 $response->setStatusCode(403);
             }
         } elseif($request->query->getAlpha('action') == 'logout') {
+            $session->get('sessionObj')->logout();
             $response->setStatusCode(200);
         } else {
             $response->setStatusCode(400);
         }
     }
-
     if($request->getMethod() == 'DELETE') {           // delete queue, delete comment
         $response->setStatusCode(400);
     }
-
     if($request->getMethod() == 'PUT') {              // enqueue, add comment
         $response->setStatusCode(400);
     }
-
 } else {
     $redirect = new RedirectResponse($_SERVER['REQUEST_URI']);
 }
