@@ -16,9 +16,12 @@ function fetchlogin(evt) {
         credentials: 'include'
     })
     .then(function(headers) {
-        console.log(headers)
+        if(headers.status == 401) {
+            console.log('login failed');
+            return;
+        }
         headers.json().then(function(body) {
-            console.log(body);
+            console.log(body); // get a CSRF token
         })
     })
     .catch(function(error) {
@@ -38,8 +41,15 @@ function fetchregister(evt) {
         body: fd,
         credentials: 'include'
     })
-    .then(headers => console.log(headers),
-        headers.json().then(body => console.log(body)))
+    .then(function(headers) {
+        if(headers.status == 400) {
+            console.log('register failed');
+            return;
+        }
+        headers.json().then(function(body) {
+            console.log(body); // get a CSRF token
+        })
+    })
     .catch(error => console.log(error));
 }
 function fetchaccountexists(evt) {
@@ -49,8 +59,19 @@ function fetchaccountexists(evt) {
             method: 'GET',
             credentials: 'include'
         })
-        .then(headers => console.log(headers),
-            headers.json().then(body => console.log(body)))
+        .then(function(headers) {
+            if(headers.status == 204) {
+                console.log('user does not exist');
+                return;
+            }
+            if(headers.status == 400) {
+                console.log('user exists');
+                return;
+            }
+            headers.json().then(function(body) {
+                console.log(body) // there will be no response, we're only interested for debugging purposes
+            })
+        })
         .catch(error => console.log(error));
     }
 }
