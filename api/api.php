@@ -37,20 +37,23 @@ if(empty($request->query->all())) {
     }
     if($request->getMethod() == 'POST') {             // register, login
         if($request->query->getAlpha('action') == 'register') {
-            if($request->request->has('username') and
-                $request->request->has('password') and
-                $request->request->has('email') and
-                $request->request->has('phone')) {
+            if($request->request->has('nick') and
+                $request->request->has('color') and
+                $request->request->has('icon') and
+                $request->request->has('pass')) {
                 $res = $session->get('sessionObj')->register(
-                    $request->request->getInt('username'),
-                    $request->request->get('password'),
-                    $request->request->get('email'),
-                    $request->request->get('phone')
+                    $request->request->getAlpha('nick'),
+                    $request->request->get('color'),
+                    $request->request->get('icon'),
+                    $request->request->get('pass'),
+                    $request->request->get('csrf')
                 );
-                if($res == true) {
+                if($res === true) {
                     $response->setStatusCode(201);
-                } else {
-                    $response->setStatusCode(400);
+                } elseif($res === false) {
+                    $response->setStatusCode(403);
+                } elseif($res === 0) {
+                    $response->setStatusCode(500);
                 }
             } else {
                 $response->setStatusCode(400);
@@ -62,11 +65,12 @@ if(empty($request->query->all())) {
                     $request->request->get('password'));
                 if ($res === false) {
                     $response->setStatusCode(401);
-                } elseif($res === 0) {
+                } elseif(count($res) == 1) {
                     $response->setStatusCode(203);
-                } else {
                     $response->setContent(json_encode($res));
+                } elseif(count($res) > 1) {
                     $response->setStatusCode(200);
+                    $response->setContent(json_encode($res));
                 }
             } else {
                 $response->setStatusCode(400);
@@ -86,10 +90,12 @@ if(empty($request->query->all())) {
                 }
             }
         } elseif($request->query->getAlpha('action') == 'isloggedin') {
-            if($session->get('sessionObj')->isLoggedIn()) {
-                $response->setStatusCode(200);
-            } else {
+            $res = $session->get('sessionObj')->isLoggedIn();
+            if($res == false) {
                 $response->setStatusCode(403);
+            } elseif(count($res) == 1) {
+                $response->setStatusCode(200);
+                $response->setContent(json_encode($res));
             }
         } elseif($request->query->getAlpha('action') == 'logout') {
             $session->get('sessionObj')->logout();

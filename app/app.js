@@ -18,14 +18,27 @@ function fetchlogin(evt) {
     .then(function(headers) {
         if(headers.status == 401) {
             console.log('login failed');
+            localStorage.removeItem('csrf');
+            localStorage.removeItem('color');
+            localStorage.removeItem('icon');
+            localStorage.removeItem('nick');
+            localStorage.removeItem('theme');
+            localStorage.removeItem('uid');
             return;
         }
         if(headers.status == 203) {
             console.log('registration required');
-            return;
+            // only need csrf
         }
         headers.json().then(function(body) {
-            console.log(body); // get a CSRF token
+            // BUG is this a 203 or 200?
+            localStorage.setItem('csrf', body.Hash);
+            localStorage.setItem('uid', loginuser.value);
+            localStorage.setItem('csrf', body.Hash);
+            localStorage.setItem('color', body.color);
+            localStorage.setItem('icon', body.icon);
+            localStorage.setItem('nick', body.nick);
+            localStorage.setItem('theme', body.theme);
         })
     })
     .catch(function(error) {
@@ -35,10 +48,11 @@ function fetchlogin(evt) {
 function fetchregister(evt) {
     evt.preventDefault();
     var fd = new FormData();
-    fd.append('username', loginuser.value);
-    fd.append('password', loginpass.value);
-    fd.append('email', regemail.value);
-    fd.append('phone', regphone.value);
+    fd.append('nick', regnick.value);
+    fd.append('color', regcolor.value.substring(1)); //lop off # in hex code
+    fd.append('icon', regicon.value);
+    fd.append('pass', regpass1.value);
+    fd.append('csrf', localStorage.getItem('csrf'));
     fetch('http://localhost:9998/api.php?action=register', 
     {
         method: 'POST',
@@ -50,9 +64,10 @@ function fetchregister(evt) {
             console.log('register failed');
             return;
         }
-        headers.json().then(function(body) {
-            console.log(body); // get a CSRF token
-        })
+        if(headers.status == 201) {
+            console.log('registration updated');
+            return;
+        }
     })
     .catch(error => console.log(error));
 }
@@ -73,7 +88,7 @@ function fetchaccountexists(evt) {
                 return;
             }
             headers.json().then(function(body) {
-                console.log(body) // there will be no response, we're only interested for debugging purposes
+                console.log(body);
             })
         })
         .catch(error => console.log(error));
@@ -85,8 +100,21 @@ function fetchisloggedin(evt) {
         method: 'GET',
         credentials: 'include'
     })
-    .then(headers => console.log(headers),
-        headers.json().then(body => console.log(body)))
+    .then(function(headers) {
+        if(headers.status == 403) {
+            console.log('not logged in');
+            localStorage.removeItem('csrf');
+            localStorage.removeItem('color');
+            localStorage.removeItem('icon');
+            localStorage.removeItem('nick');
+            localStorage.removeItem('theme');
+            localStorage.removeItem('uid');
+            return;
+        }
+        headers.json().then(function(body) {
+            localStorage.setItem('csrf', body.Hash);
+        })
+    })
     .catch(error => console.log(error));
 }
 function fetchlogout(evt) {
@@ -95,7 +123,16 @@ function fetchlogout(evt) {
         method: 'GET',
         credentials: 'include'
     })
-    .then(headers => console.log(headers),
-        headers.json().then(body => console.log(body)))
+    .then(function(headers) {
+        if(headers.status != 200) {
+            console.log('logout failed Server-Side, but make client login again');
+        }
+        localStorage.removeItem('csrf');
+        localStorage.removeItem('color');
+        localStorage.removeItem('icon');
+        localStorage.removeItem('nick');
+        localStorage.removeItem('theme');
+        localStorage.removeItem('uid');    
+    })
     .catch(error => console.log(error));
 }

@@ -10,6 +10,7 @@
         private $user_icon;
         private $user_color;
         private $user_privilege = 0;
+        private $user_token;
 
         private $origin;
 
@@ -28,36 +29,48 @@
         }
         public function login($username, $password) {
             global $sqsdb;
-            // call the dbobject for SQL
-            // return a session hash if successful
-            $this->user_id = $sqsdb->checkLogin($username, $password);
-            if($this->user_id > 0) {
-                return Array('Hash'=>'90q2u3lksafdu90342oifkl');
-            } elseif($this->user_id === 0) {
-                return 0;
-            } else {
+
+            $res = $sqsdb->checkLogin($username, $password);
+            if($res === false) {
                 return false;
+            } elseif(count($res) > 1) {
+                $this->user_id = $res['user_id'];
+                $this->user_privilege = 1;
+                $this->user_token = md5(json_encode($res));
+                return Array('nick'=>$res['user_nick'],
+                'theme'=>$res['user_theme'],
+                'color'=>$res['user_color'],
+                'icon'=>$res['user_icon'],
+                'Hash'=>$this->user_token);
+            } elseif(count($res) == 1) {
+                $this->user_id = $res['user_id'];
+                $this->user_token = md5(json_encode($res));
+                return Array('Hash'=>$this->user_token);
             }
         }
-        public function register($username, $password, $email, $phone) {
+        public function register($nick, $color, $icon, $pass, $csrf) {
             global $sqsdb;
-
-            // call the dbobject for SQL
-            if($sqsdb->registerUser($username, $password, $email, $phone)) {
-                return true;
+            if($csrf == $this->user_token) {
+                if($sqsdb->registerUser($this->user_id, $nick, $color, $icon, $pass)) {
+                    return true;
+                } else {
+                    return 0;
+                }
             } else {
                 return false;
             }
+            // call the dbobject for SQL
         }
         public function isLoggedIn() {
-            if($this->user_id == 0) {
+            if($this->user_id === 0) {
                 return false;
             } else {
-                return true;
+                return Array('Hash'=>$this->user_token);
             }
         }
         public function logout() {
             $this->user_id = 0;
+            $this->user_privilege = 0;
         }
     }
 ?>
