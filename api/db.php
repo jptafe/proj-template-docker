@@ -62,5 +62,20 @@
                 return false;
             }
         }
+        function logEvent($uid, $url, $resp_code, $source_ip) {
+            $sql = "INSERT INTO logtable (url, uid, response_code, ip_addr) 
+                VALUES (:url, :uid, :resp_code, :ip);";
+            $stmt = $this->dbconn->prepare($sql);
+            $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+            $stmt->bindParam(':url', $url, PDO::PARAM_STR);
+            $stmt->bindParam(':resp_code', $resp_code, PDO::PARAM_INT);
+            $stmt->bindParam(':ip', $source_ip, PDO::PARAM_STR);
+            $result = $stmt->execute();
+            if($result === true) {
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 ?>

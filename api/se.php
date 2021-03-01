@@ -72,5 +72,9 @@
             $this->user_id = 0;
             $this->user_privilege = 0;
         }
+        public function validate($type, $dirty_string) {
+        }
+        public function logEvent() {
+        }
     }
 ?>

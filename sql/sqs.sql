@@ -142,6 +142,32 @@ CREATE TABLE `suggestion` (
 -- Indexes for dumped tables
 --
 
+
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+--
+-- Database: `sqs`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `logtable`
+--
+
+CREATE TABLE `logtable` (
+  `id` int(11) NOT NULL,
+  `datestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `url` varchar(256) NOT NULL,
+  `uid` int(12) NOT NULL,
+  `response_code` int(11) NOT NULL,
+  `ip_addr` varchar(39) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
 --
 -- Indexes for table `class`
 --
@@ -210,3 +236,4 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+

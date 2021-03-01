@@ -114,6 +114,8 @@ if(empty($request->query->all())) {
     $redirect = new RedirectResponse($_SERVER['REQUEST_URI']);
 }
 
+// Do logging just before sending response?
+
 $response->send();
 
 ?>
