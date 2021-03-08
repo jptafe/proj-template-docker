@@ -18,11 +18,11 @@
             $this->origin = $_ENV['ORIGIN'];
         }
         public function is_rate_limited() {
-            if($last_visit == 0) {
-                $last_visit = time();
+            if($this->last_visit == 0) {
+                $this->last_visit = time();
                 return false;
             }
-            if($last_visit == time()) {
+            if($this->last_visit == time()) {
                 return true;
             }
             return false;
